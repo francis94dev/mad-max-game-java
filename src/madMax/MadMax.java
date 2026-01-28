@@ -12,10 +12,19 @@ import java.util.List;
 import java.util.Random;
 
 public class MadMax extends JPanel implements ActionListener, KeyListener {
+    // Definición de Estados del Juego. hhuhjkhjjjnkjnkjn
+    public enum EstadoJuego {
+        MENU,
+        JUGANDO,
+        GAME_OVER
+    }
+
+    private EstadoJuego estadoActual = EstadoJuego.MENU;
+
     private static final int ANCHO = 800;
     private static final int ALTO = 600;
 
-    private Coche jugador; 
+    private Coche jugador;
     private List<Coche> vehiculos;
     private List<Peaton> peatones;
     private List<ManchaSangre> manchasSangre;
@@ -28,7 +37,6 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     private int oleada;
     private float tiempoRestante;
     private int puntuacionObjetivo;
-    private boolean juegoTerminado;
 
     // Cámara
     private double camaraX, camaraY;
@@ -40,6 +48,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     private BufferedImage[] imagenesCocheNPC;
     private BufferedImage[] imagenesCocheNPCDestruido;
     private BufferedImage imagenSangre;
+    private BufferedImage imagenTitulo;
 
     // Dimensiones del mapa
     private int anchoFondo = 1600;
@@ -55,13 +64,29 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
 
         random = new Random();
-        iniciarJuego();
 
+        // Cargar todos los recursos
+        cargarRecursos();
+
+        // Inicializar objetos del juego
+        iniciarPartida();
+
+        // El timer corre siempre, pero la lógica depende del estado
         timer = new Timer(16, this);
         timer.start();
     }
 
-    private void iniciarJuego() {
+    private void cargarRecursos() {
+        cargarFondo();
+        cargarImagenPeaton();
+        cargarImagenCocheJugador();
+        cargarImagenesCocheNPC();
+        cargarImagenesCocheNPCDestruido();
+        cargarImagenSangre();
+        cargarImagenTitulo();
+    }
+
+    private void iniciarPartida() {
         jugador = new Coche(anchoFondo / 2, altoFondo / 2, Color.RED, false, random);
         vehiculos = new ArrayList<>();
         peatones = new ArrayList<>();
@@ -70,19 +95,16 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         oleada = 1;
         tiempoRestante = 60;
         puntuacionObjetivo = 1000;
-        juegoTerminado = false;
 
         puntuacion = 0;
         camaraX = jugador.x;
         camaraY = jugador.y;
 
-        // Cargar recursos
-        cargarFondo();
-        cargarImagenPeaton();
-        cargarImagenCocheJugador();
-        cargarImagenesCocheNPC();
-        cargarImagenesCocheNPCDestruido();
-        cargarImagenSangre();
+        // Reiniciar variables de control
+        arribaPresionado = false;
+        abajoPresionado = false;
+        izquierdaPresionado = false;
+        derechaPresionado = false;
 
         // Generar tráfico
         for (int i = 0; i < 12; i++) {
@@ -92,6 +114,19 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         // Generar peatones
         for (int i = 0; i < 20; i++) {
             generarPeaton();
+        }
+    }
+
+    private void cargarImagenTitulo() {
+        try {
+            File f = new File("title_screen.png");
+            if (f.exists()) {
+                imagenTitulo = ImageIO.read(f);
+            } else {
+                System.out.println("AVISO: No se encontró 'title_screen.png'.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error cargando titulo: " + e.getMessage());
         }
     }
 
@@ -196,25 +231,24 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        actualizarJuego();
+        if (estadoActual == EstadoJuego.JUGANDO) {
+            actualizarJuego();
+        }
         repaint();
     }
 
     private void actualizarJuego() {
-        if (juegoTerminado)
-            return;
-
         tiempoRestante -= 0.016;
         if (tiempoRestante <= 0) {
-            juegoTerminado = true;
+            estadoActual = EstadoJuego.GAME_OVER;
             tiempoRestante = 0;
         }
 
         if (puntuacion >= puntuacionObjetivo) {
             oleada++;
-            puntuacionObjetivo += 1500; // Incremento fijo o dinámico
-            tiempoRestante = 60; // Reiniciar tiempo a 60s (o sumar)
-            jugador.setVelocidadMaxima(7.0 + (oleada * 1.0)); // Aumentar velocidad
+            puntuacionObjetivo += 1500;
+            tiempoRestante = 60;
+            jugador.setVelocidadMaxima(7.0 + (oleada * 1.0));
 
             for (int i = 0; i < 15; i++) {
                 generarVehiculo();
@@ -251,7 +285,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
                 Rectangle2D npcHitbox = new Rectangle2D.Double(npc.x - 10, npc.y - 10, 20, 20);
                 if (jugador.obtenerLimites().intersects(npcHitbox)) {
                     npc.estaDestruido = true;
-                    puntuacion += 50;
+                    puntuacion += 70; // updated score as per user edit
                     jugador.velocidad *= 0.5;
                     npc.velocidad = 0;
                 }
@@ -277,6 +311,29 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // Estado MENU
+        if (estadoActual == EstadoJuego.MENU) {
+            if (imagenTitulo != null) {
+                g2d.drawImage(imagenTitulo, 0, 0, ANCHO, ALTO, null);
+            } else {
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, ANCHO, ALTO);
+                g2d.setColor(Color.ORANGE);
+                g2d.setFont(new Font("Arial", Font.BOLD, 60));
+                String titulo = "MAD MAX";
+                int w = g2d.getFontMetrics().stringWidth(titulo);
+                g2d.drawString(titulo, ANCHO / 2 - w / 2, ALTO / 2 - 50);
+
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(new Font("Arial", Font.BOLD, 24));
+                String sub = "Presiona ENTER para comenzar";
+                int w2 = g2d.getFontMetrics().stringWidth(sub);
+                g2d.drawString(sub, ANCHO / 2 - w2 / 2, ALTO / 2 + 50);
+            }
+            return;
+        }
+
+        // Estado JUGANDO o GAME_OVER (renderiza el juego de fondo)
         int offsetX = ANCHO / 2 - (int) camaraX;
         int offsetY = ALTO / 2 - (int) camaraY;
 
@@ -314,36 +371,60 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         g2d.drawString("Oleada: " + oleada, 15, 65);
         g2d.drawString("Tiempo: " + (int) tiempoRestante + "s", 15, 85);
 
-        if (juegoTerminado) {
+        if (estadoActual == EstadoJuego.GAME_OVER) {
             g2d.setColor(new Color(0, 0, 0, 200));
-            g2d.fillRect(0, ALTO / 2 - 50, ANCHO, 100);
+            g2d.fillRect(0, ALTO / 2 - 80, ANCHO, 160);
+
             g2d.setColor(Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 48));
             String msg = "GAME OVER";
             int w = g2d.getFontMetrics().stringWidth(msg);
-            g2d.drawString(msg, ANCHO / 2 - w / 2, ALTO / 2 + 10);
+            g2d.drawString(msg, ANCHO / 2 - w / 2, ALTO / 2 - 10);
 
             g2d.setColor(Color.WHITE);
             g2d.setFont(new Font("Arial", Font.BOLD, 20));
             String subMsg = "Puntuación Final: " + puntuacion;
             int w2 = g2d.getFontMetrics().stringWidth(subMsg);
-            g2d.drawString(subMsg, ANCHO / 2 - w2 / 2, ALTO / 2 + 40);
+            g2d.drawString(subMsg, ANCHO / 2 - w2 / 2, ALTO / 2 + 25);
+
+            g2d.setFont(new Font("Arial", Font.PLAIN, 16));
+            String restartMsg = "Presiona 'R' para Reintentar o 'M' para Menú";
+            int w3 = g2d.getFontMetrics().stringWidth(restartMsg);
+            g2d.drawString(restartMsg, ANCHO / 2 - w3 / 2, ALTO / 2 + 55);
         }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (estadoActual == EstadoJuego.MENU) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                iniciarPartida();
+                estadoActual = EstadoJuego.JUGANDO;
+            }
+            return; // Importante: no procesar otros controles
+        }
+
+        if (estadoActual == EstadoJuego.GAME_OVER) {
+            if (e.getKeyCode() == KeyEvent.VK_R) {
+                iniciarPartida();
+                estadoActual = EstadoJuego.JUGANDO;
+            } else if (e.getKeyCode() == KeyEvent.VK_M) {
+                estadoActual = EstadoJuego.MENU;
+            }
+            return;
+        }
+
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 arribaPresionado = true;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 abajoPresionado = true;
                 break;
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 izquierdaPresionado = true;
                 break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 derechaPresionado = true;
                 break;
         }
@@ -352,16 +433,16 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 arribaPresionado = false;
                 break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 abajoPresionado = false;
                 break;
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 izquierdaPresionado = false;
                 break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 derechaPresionado = false;
                 break;
         }
