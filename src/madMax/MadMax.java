@@ -12,26 +12,28 @@ import java.util.List;
 import java.util.Random;
 
 public class MadMax extends JPanel implements ActionListener, KeyListener {
-    // Definición de Estados del Juego. hhuhjkhjjjnkjnkjn
+    // Definición de Estados del Juego
     public enum EstadoJuego {
         MENU,
         JUGANDO,
         GAME_OVER
     }
 
-    private EstadoJuego estadoActual = EstadoJuego.MENU;
+    private EstadoJuego estadoActual = EstadoJuego.MENU; // Empezamos en el menú
 
+    // Tamaño de la ventana
     private static final int ANCHO = 800;
     private static final int ALTO = 600;
 
-    private Coche jugador;
-    private List<Coche> vehiculos;
-    private List<Peaton> peatones;
-    private List<ManchaSangre> manchasSangre;
+    // Objetos del juego
+    private Coche jugador; // El coche que controlamos
+    private List<Coche> vehiculos; // Los coches enemigos
+    private List<Peaton> peatones; // La gente que camina
+    private List<ManchaSangre> manchasSangre; // Efectos de sangre
 
-    private Timer timer;
-    private Random random;
-    private int puntuacion;
+    private Timer timer; // Para el bucle del juego
+    private Random random; // Para generar cosas aleatorias
+    private int puntuacion; // Puntos del jugador
 
     // Sistema de Oleadas
     private int oleada;
@@ -58,22 +60,24 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     private boolean arribaPresionado, abajoPresionado, izquierdaPresionado, derechaPresionado;
 
     public MadMax() {
+        // Configuración de la ventana (JPanel)
         setPreferredSize(new Dimension(ANCHO, ALTO));
-        setBackground(new Color(60, 60, 60));
-        setFocusable(true);
-        addKeyListener(this);
+        setBackground(new Color(60, 60, 60)); // Color gris de fondo
+        setFocusable(true); // Para que detecte las teclas
+        addKeyListener(this); // Añadimos el "escucha" de teclas
 
         random = new Random();
 
-        // Cargar todos los recursos
+        // Cargar todos los recursos (imágenes)
         cargarRecursos();
 
-        // Inicializar objetos del juego
+        // Inicializar objetos del juego (resetear variables)
         iniciarPartida();
 
         // El timer corre siempre, pero la lógica depende del estado
+        // 16ms es aproximadamente 60 imágenes por segundo (FPS)
         timer = new Timer(16, this);
-        timer.start();
+        timer.start(); // Arranca el juego
     }
 
     private void cargarRecursos() {
@@ -86,32 +90,37 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         cargarImagenTitulo();
     }
 
+    // Prepara todo para empezar una partida nueva
     private void iniciarPartida() {
+        // Creamos al jugador en el centro
         jugador = new Coche(anchoFondo / 2, altoFondo / 2, Color.RED, false, random);
+
+        // Listas vacías para llenarlas luego
         vehiculos = new ArrayList<>();
         peatones = new ArrayList<>();
         manchasSangre = new ArrayList<>();
 
+        // Valores iniciales
         oleada = 1;
         tiempoRestante = 60;
         puntuacionObjetivo = 1000;
-
         puntuacion = 0;
+
+        // La cámara empieza donde el jugador
         camaraX = jugador.x;
         camaraY = jugador.y;
 
-        // Reiniciar variables de control
+        // Reiniciar variables de control (teclas sueltas)
         arribaPresionado = false;
         abajoPresionado = false;
         izquierdaPresionado = false;
         derechaPresionado = false;
 
-        // Generar tráfico
+        // Generar tráfico y gente al principio
         for (int i = 0; i < 12; i++) {
             generarVehiculo();
         }
 
-        // Generar peatones
         for (int i = 0; i < 20; i++) {
             generarPeaton();
         }
@@ -216,13 +225,16 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    // Crea un coche enemigo en una posición al azar
     private void generarVehiculo() {
         double x = random.nextDouble() * anchoFondo;
         double y = random.nextDouble() * altoFondo;
+        // Color aleatorio
         Color color = new Color(random.nextInt(200) + 55, random.nextInt(200) + 55, random.nextInt(200) + 55);
         vehiculos.add(new Coche(x, y, color, true, random));
     }
 
+    // Crea un peatón en una posición al azar
     private void generarPeaton() {
         double x = random.nextDouble() * anchoFondo;
         double y = random.nextDouble() * altoFondo;
@@ -237,13 +249,16 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         repaint();
     }
 
+    // Método donde ocurre toda la lógica del juego (movimiento, choques, etc.)
     private void actualizarJuego() {
+        // Restamos tiempo (aprox 0.016 segundos por vuelta)
         tiempoRestante -= 0.016;
         if (tiempoRestante <= 0) {
-            estadoActual = EstadoJuego.GAME_OVER;
+            estadoActual = EstadoJuego.GAME_OVER; // Se acabó el tiempo
             tiempoRestante = 0;
         }
 
+        // Si llegamos a los puntos necesarios, pasamos de ronda
         if (puntuacion >= puntuacionObjetivo) {
             oleada++;
             puntuacionObjetivo += 1500;
@@ -305,13 +320,15 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    // Método para dibujar todo en la pantalla
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        super.paintComponent(g); // Limpia la pantalla
         Graphics2D g2d = (Graphics2D) g;
+        // Esto hace que los bordes se vean mejor (suavizados)
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Estado MENU
+        // Si estamos en el MENÚ, dibujamos la pantalla de título
         if (estadoActual == EstadoJuego.MENU) {
             if (imagenTitulo != null) {
                 g2d.drawImage(imagenTitulo, 0, 0, ANCHO, ALTO, null);
@@ -362,14 +379,62 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     }
 
     private void dibujarHUD(Graphics2D g2d) {
-        g2d.setColor(new Color(0, 0, 0, 150));
-        g2d.fillRect(5, 5, 250, 100);
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 16));
-        g2d.drawString("Puntos: " + puntuacion + " / " + puntuacionObjetivo, 15, 25);
-        g2d.drawString("Velocidad: " + (int) Math.abs(jugador.velocidad * 10), 15, 45);
-        g2d.drawString("Oleada: " + oleada, 15, 65);
-        g2d.drawString("Tiempo: " + (int) tiempoRestante + "s", 15, 85);
+        // Variables para la posición y tamaño del cuadro
+        int x = 5;
+        int y = 5;
+        int ancho = 250;
+        int alto = 100;
+
+        // Dibujamos el fondo del cuadro
+        // Color gris oscuro semi-transparente
+        g2d.setColor(new Color(20, 20, 25, 200));
+        g2d.fillRect(x, y, ancho, alto);
+
+        // Borde del cuadro
+        // Color naranja para el borde
+        g2d.setStroke(new BasicStroke(2));
+        g2d.setColor(new Color(180, 100, 40));
+        g2d.drawRect(x, y, ancho, alto);
+
+        // Configuración para el texto
+        g2d.setFont(new Font("Arial", Font.BOLD, 15));
+
+        // Mostramos los puntos en color dorado
+        g2d.setColor(new Color(255, 190, 100));
+        g2d.drawString("PUNTOS: " + puntuacion + " / " + puntuacionObjetivo, x + 15, y + 25);
+
+        // Color gris claro para el resto de datos
+        g2d.setColor(new Color(220, 220, 220));
+        g2d.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        // Mostramos la oleada y el tiempo
+        g2d.drawString("OLEADA: " + oleada, x + 15, y + 50);
+
+        // Si queda poco tiempo lo ponemos en rojo
+        if (tiempoRestante < 10)
+            g2d.setColor(new Color(255, 80, 80));
+        g2d.drawString("TIEMPO: " + (int) tiempoRestante + "s", x + 130, y + 50);
+
+        // Barra de velocidad
+        // Regla de 3 para calcular el ancho de la barra según la velocidad
+        int velocidadReal = (int) Math.abs(jugador.velocidad * 10);
+        int maxVelocidad = 100; // Ajusta esto a tu máx velocidad
+        int anchoBarra = (int) ((velocidadReal / (double) maxVelocidad) * 220); // 220 es el ancho máx de la barra
+        if (anchoBarra > 220)
+            anchoBarra = 220;
+
+        // Texto de velocidad
+        g2d.setColor(new Color(180, 180, 180));
+        g2d.setFont(new Font("Arial", Font.BOLD, 11));
+        g2d.drawString("VELOCIDAD " + velocidadReal + " km/h", x + 15, y + 75);
+
+        // Fondo de la barra
+        g2d.setColor(new Color(50, 50, 50));
+        g2d.fillRect(x + 15, y + 80, 220, 8);
+
+        // Relleno naranja según la velocidad
+        g2d.setColor(new Color(255, 140, 0));
+        g2d.fillRect(x + 15, y + 80, anchoBarra, 8);
 
         if (estadoActual == EstadoJuego.GAME_OVER) {
             g2d.setColor(new Color(0, 0, 0, 200));
@@ -394,16 +459,19 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    // Cuando presionamos una tecla
     @Override
     public void keyPressed(KeyEvent e) {
+        // Controles del MENÚ
         if (estadoActual == EstadoJuego.MENU) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                iniciarPartida();
+                iniciarPartida(); // Empezar juego nuevo
                 estadoActual = EstadoJuego.JUGANDO;
             }
             return; // Importante: no procesar otros controles
         }
 
+        // Controles de GAME OVER
         if (estadoActual == EstadoJuego.GAME_OVER) {
             if (e.getKeyCode() == KeyEvent.VK_R) {
                 iniciarPartida();
@@ -460,16 +528,18 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     public void keyTyped(KeyEvent e) {
     }
 
+    // El main arranca la ventana
     public static void main(String[] args) {
+        // SwingUtilities.invokeLater es para que la interfaz no se bloquee
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Mad Max: Wasteland Driver");
             MadMax game = new MadMax();
             frame.add(game);
-            frame.pack();
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-            frame.setResizable(false);
+            frame.pack(); // Ajusta el tamaño al del panel
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Cierra todo al salir
+            frame.setLocationRelativeTo(null); // Centra la ventana
+            frame.setVisible(true); // Muestra la ventana
+            frame.setResizable(false); // Que no se pueda cambiar el tamaño
         });
     }
 }
