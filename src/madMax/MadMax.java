@@ -416,15 +416,19 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
+            case KeyEvent.VK_UP:
                 arribaPresionado = true;
                 break;
             case KeyEvent.VK_S:
+            case KeyEvent.VK_DOWN:
                 abajoPresionado = true;
                 break;
             case KeyEvent.VK_A:
+            case KeyEvent.VK_LEFT:
                 izquierdaPresionado = true;
                 break;
             case KeyEvent.VK_D:
+            case KeyEvent.VK_RIGHT:
                 derechaPresionado = true;
                 break;
         }
@@ -434,15 +438,19 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
+            case KeyEvent.VK_UP:
                 arribaPresionado = false;
                 break;
             case KeyEvent.VK_S:
+            case KeyEvent.VK_DOWN:
                 abajoPresionado = false;
                 break;
             case KeyEvent.VK_A:
+            case KeyEvent.VK_LEFT:
                 izquierdaPresionado = false;
                 break;
             case KeyEvent.VK_D:
+            case KeyEvent.VK_RIGHT:
                 derechaPresionado = false;
                 break;
         }
