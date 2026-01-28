@@ -51,6 +51,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     private BufferedImage[] imagenesCocheNPCDestruido;
     private BufferedImage imagenSangre;
     private BufferedImage imagenTitulo;
+    private BufferedImage imagenGameOver;
 
     // Dimensiones del mapa
     private int anchoFondo = 1600;
@@ -88,6 +89,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         cargarImagenesCocheNPCDestruido();
         cargarImagenSangre();
         cargarImagenTitulo();
+        cargarImagenGameOver();
     }
 
     // Prepara todo para empezar una partida nueva
@@ -136,6 +138,19 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             }
         } catch (Exception e) {
             System.out.println("Error cargando titulo: " + e.getMessage());
+        }
+    }
+
+    private void cargarImagenGameOver() {
+        try {
+            File f = new File("game_over.png");
+            if (f.exists()) {
+                imagenGameOver = ImageIO.read(f);
+            } else {
+                System.out.println("AVISO: No se encontró 'game_over.png'.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error cargando game over: " + e.getMessage());
         }
     }
 
@@ -437,25 +452,23 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         g2d.fillRect(x + 15, y + 80, anchoBarra, 8);
 
         if (estadoActual == EstadoJuego.GAME_OVER) {
-            g2d.setColor(new Color(0, 0, 0, 200));
-            g2d.fillRect(0, ALTO / 2 - 80, ANCHO, 160);
+            // Dibujar imagen de Game Over si existe
+            if (imagenGameOver != null) {
+                g2d.drawImage(imagenGameOver, 0, 0, ANCHO, ALTO, null);
+            } else {
+                // Fallback si no hay imagen
+                g2d.setColor(new Color(0, 0, 0, 200));
+                g2d.fillRect(0, ALTO / 2 - 80, ANCHO, 160);
 
-            g2d.setColor(Color.RED);
-            g2d.setFont(new Font("Arial", Font.BOLD, 48));
-            String msg = "GAME OVER";
-            int w = g2d.getFontMetrics().stringWidth(msg);
-            g2d.drawString(msg, ANCHO / 2 - w / 2, ALTO / 2 - 10);
+                g2d.setColor(Color.RED);
+                g2d.setFont(new Font("Arial", Font.BOLD, 48));
+                String msg = "GAME OVER";
+                int w = g2d.getFontMetrics().stringWidth(msg);
+                g2d.drawString(msg, ANCHO / 2 - w / 2, ALTO / 2 - 10);
+            }
 
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 20));
-            String subMsg = "Puntuación Final: " + puntuacion;
-            int w2 = g2d.getFontMetrics().stringWidth(subMsg);
-            g2d.drawString(subMsg, ANCHO / 2 - w2 / 2, ALTO / 2 + 25);
+            // Datos de puntuación y reinicio
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 16));
-            String restartMsg = "Presiona 'R' para Reintentar o 'M' para Menú";
-            int w3 = g2d.getFontMetrics().stringWidth(restartMsg);
-            g2d.drawString(restartMsg, ANCHO / 2 - w3 / 2, ALTO / 2 + 55);
         }
     }
 
@@ -473,7 +486,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
         // Controles de GAME OVER
         if (estadoActual == EstadoJuego.GAME_OVER) {
-            if (e.getKeyCode() == KeyEvent.VK_R) {
+            if (e.getKeyCode() == KeyEvent.VK_R || e.getKeyCode() == KeyEvent.VK_ENTER) {
                 iniciarPartida();
                 estadoActual = EstadoJuego.JUGANDO;
             } else if (e.getKeyCode() == KeyEvent.VK_M) {
