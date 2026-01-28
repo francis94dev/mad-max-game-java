@@ -15,7 +15,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     private static final int ANCHO = 800;
     private static final int ALTO = 600;
 
-    private Coche jugador;
+    private Coche jugador; 
     private List<Coche> vehiculos;
     private List<Peaton> peatones;
     private List<ManchaSangre> manchasSangre;
