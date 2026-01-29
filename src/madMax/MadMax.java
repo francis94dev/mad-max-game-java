@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         GAME_OVER
     }
 
+    private Clip musica;
     private EstadoJuego estadoActual = EstadoJuego.MENU; // Empezamos en el menú
 
     // Tamaño de la ventana
@@ -270,6 +272,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         tiempoRestante -= 0.016;
         if (tiempoRestante <= 0) {
             estadoActual = EstadoJuego.GAME_OVER; // Se acabó el tiempo
+            gestionarMusica(false);
             tiempoRestante = 0;
         }
 
@@ -479,6 +482,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         if (estadoActual == EstadoJuego.MENU) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 iniciarPartida(); // Empezar juego nuevo
+                gestionarMusica(true);
                 estadoActual = EstadoJuego.JUGANDO;
             }
             return; // Importante: no procesar otros controles
@@ -488,6 +492,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         if (estadoActual == EstadoJuego.GAME_OVER) {
             if (e.getKeyCode() == KeyEvent.VK_R || e.getKeyCode() == KeyEvent.VK_ENTER) {
                 iniciarPartida();
+                gestionarMusica(true);
                 estadoActual = EstadoJuego.JUGANDO;
             } else if (e.getKeyCode() == KeyEvent.VK_M) {
                 estadoActual = EstadoJuego.MENU;
@@ -539,6 +544,37 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+    }
+
+    private void gestionarMusica(boolean reproducir) {
+        try {
+            if (reproducir) {
+                if (musica != null && musica.isRunning())
+                    return;
+
+                if (musica == null) { // Solo cargamos la primera vez
+                    File f = new File("Screen_Recording_20260128_205851_YouTube (online-audio-converter.com).wav");
+                    if (!f.exists())
+                        f = new File("musica.wav");
+                    if (!f.exists())
+                        return;
+
+                    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f);
+                    musica = AudioSystem.getClip();
+                    musica.open(audioIn);
+                    ((FloatControl) musica.getControl(FloatControl.Type.MASTER_GAIN)).setValue(-10.0f);
+                }
+
+                musica.setFramePosition(0); // Empezar desde el principio
+                musica.setLoopPoints(0, -1); // Asegurar loop de todo el archivo
+                musica.loop(Clip.LOOP_CONTINUOUSLY);
+            } else {
+                if (musica != null)
+                    musica.stop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // El main arranca la ventana
