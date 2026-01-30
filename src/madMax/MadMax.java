@@ -7,7 +7,6 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -132,9 +131,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     private void cargarImagenTitulo() {
         try {
-            File f = new File("title_screen.png");
-            if (f.exists()) {
-                imagenTitulo = ImageIO.read(f);
+            java.net.URL url = getClass().getResource("/images/title_screen.png");
+            if (url != null) {
+                imagenTitulo = ImageIO.read(url);
             } else {
                 System.out.println("AVISO: No se encontró 'title_screen.png'.");
             }
@@ -145,9 +144,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     private void cargarImagenGameOver() {
         try {
-            File f = new File("game_over.png");
-            if (f.exists()) {
-                imagenGameOver = ImageIO.read(f);
+            java.net.URL url = getClass().getResource("/images/game_over.png");
+            if (url != null) {
+                imagenGameOver = ImageIO.read(url);
             } else {
                 System.out.println("AVISO: No se encontró 'game_over.png'.");
             }
@@ -158,11 +157,11 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     private void cargarFondo() {
         try {
-            File archivoImagen = new File("fondo.png");
-            if (!archivoImagen.exists())
-                archivoImagen = new File("fondo.jpg");
-            if (archivoImagen.exists()) {
-                fondo = ImageIO.read(archivoImagen);
+            java.net.URL url = getClass().getResource("/images/fondo.png");
+            if (url == null)
+                url = getClass().getResource("/images/fondo.jpg");
+            if (url != null) {
+                fondo = ImageIO.read(url);
                 anchoFondo = fondo.getWidth();
                 altoFondo = fondo.getHeight();
             }
@@ -175,9 +174,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         imagenesPeaton = new BufferedImage[4];
         try {
             for (int i = 1; i <= 4; i++) {
-                File f = new File("peaton" + i + ".png");
-                if (f.exists())
-                    imagenesPeaton[i - 1] = ImageIO.read(f);
+                java.net.URL url = getClass().getResource("/images/peaton" + i + ".png");
+                if (url != null)
+                    imagenesPeaton[i - 1] = ImageIO.read(url);
             }
         } catch (Exception e) {
             System.out.println("Error cargando peatones: " + e.getMessage());
@@ -186,9 +185,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     private void cargarImagenCocheJugador() {
         try {
-            File f = new File("coche_jugador.png");
-            if (f.exists())
-                imagenCocheJugador = ImageIO.read(f);
+            java.net.URL url = getClass().getResource("/images/coche_jugador.png");
+            if (url != null)
+                imagenCocheJugador = ImageIO.read(url);
         } catch (Exception e) {
             System.out.println("Error cargando coche jugador: " + e.getMessage());
         }
@@ -198,9 +197,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         imagenesCocheNPC = new BufferedImage[4];
         try {
             for (int i = 1; i <= 4; i++) {
-                File f = new File("npc_car" + i + ".png");
-                if (f.exists())
-                    imagenesCocheNPC[i - 1] = ImageIO.read(f);
+                java.net.URL url = getClass().getResource("/images/npc_car" + i + ".png");
+                if (url != null)
+                    imagenesCocheNPC[i - 1] = ImageIO.read(url);
             }
         } catch (Exception e) {
             System.out.println("Error cargando coches NPC: " + e.getMessage());
@@ -212,9 +211,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         int contCargados = 0;
         try {
             for (int i = 1; i <= 4; i++) {
-                File f = new File("npc_car" + i + "_destruido.png");
-                if (f.exists()) {
-                    imagenesCocheNPCDestruido[i - 1] = ImageIO.read(f);
+                java.net.URL url = getClass().getResource("/images/npc_car" + i + "_destruido.png");
+                if (url != null) {
+                    imagenesCocheNPCDestruido[i - 1] = ImageIO.read(url);
                     contCargados++;
                 }
             }
@@ -230,9 +229,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
     private void cargarImagenSangre() {
         try {
-            File f = new File("sangre.png");
-            if (f.exists()) {
-                imagenSangre = ImageIO.read(f);
+            java.net.URL url = getClass().getResource("/images/sangre.png");
+            if (url != null) {
+                imagenSangre = ImageIO.read(url);
                 System.out.println("Imagen de sangre cargada.");
             } else {
                 System.out.println("AVISO: No se encontró 'sangre.png'.");
@@ -553,13 +552,13 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
                     return;
 
                 if (musica == null) { // Solo cargamos la primera vez
-                    File f = new File("Screen_Recording_20260128_205851_YouTube (online-audio-converter.com).wav");
-                    if (!f.exists())
-                        f = new File("musica.wav");
-                    if (!f.exists())
+                    java.net.URL url = getClass().getResource("/music/musica.wav");
+                    if (url == null) {
+                        System.out.println("AVISO: No se encontró 'musica.wav' en recursos.");
                         return;
+                    }
 
-                    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f);
+                    AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
                     musica = AudioSystem.getClip();
                     musica.open(audioIn);
                     ((FloatControl) musica.getControl(FloatControl.Type.MASTER_GAIN)).setValue(-10.0f);
