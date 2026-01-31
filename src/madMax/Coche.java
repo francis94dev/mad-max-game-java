@@ -58,13 +58,15 @@ public class Coche {
             return;
 
         if (estaDestruido) {
-            velocidad *= 0.90;
+            velocidad *= 0.90; // Desacelera si está destruido
             return;
         }
 
         velocidad = 2 + random.nextDouble();
         if (random.nextInt(100) == 0)
             anguloObjetivo = random.nextDouble() * Math.PI * 2;
+
+        // Interpolación hacia el ángulo objetivo
         double diff = anguloObjetivo - angulo;
         while (diff > Math.PI)
             diff -= Math.PI * 2;

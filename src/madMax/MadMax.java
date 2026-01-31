@@ -260,9 +260,9 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (estadoActual == EstadoJuego.JUGANDO) {
-            actualizarJuego();
+            actualizarJuego(); // Lógica del juego
         }
-        repaint();
+        repaint(); // Repinta el juego
     }
 
     // Método donde ocurre toda la lógica del juego (movimiento, choques, etc.)
@@ -301,6 +301,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         jugador.x = Math.max(20, Math.min(anchoFondo - 20, jugador.x));
         jugador.y = Math.max(20, Math.min(altoFondo - 20, jugador.y));
 
+        // Suavizado de cámara (interpolación lineal)
         camaraX += (jugador.x - camaraX) * 0.1;
         camaraY += (jugador.y - camaraY) * 0.1;
 
@@ -328,6 +329,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             Peaton p = peatones.get(i);
             p.actualizar(anchoFondo, altoFondo);
 
+            // Colisión jugador-peatón
             if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.velocidad) > 2) {
                 manchasSangre.add(new ManchaSangre(p.x, p.y));
                 peatones.remove(i);
