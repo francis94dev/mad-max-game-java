@@ -105,15 +105,15 @@ classDiagram
     }
     
     class Coche {
-        +double x
-        +double y
-        +double angulo
-        +double velocidad
-        +double anguloObjetivo
-        +Color color
-        +boolean esIA
-        +boolean estaDestruido
-        +int indiceImagen
+        -double x
+        -double y
+        -double angulo
+        -double velocidad
+        -double anguloObjetivo
+        -Color color
+        -boolean esIA
+        -boolean estaDestruido
+        -int indiceImagen
         -double velocidadMaxima
         -Random random
         +acelerar()
@@ -123,17 +123,16 @@ classDiagram
         +actualizarIA()
         +actualizar()
         +obtenerLimites() Rectangle2D
-        +setVelocidadMaxima(double max)
         +dibujar(Graphics2D, int, int, BufferedImage, BufferedImage[], BufferedImage[])
     }
     
     class Peaton {
-        +double x
-        +double y
-        +double vx
-        +double vy
-        +Color color
-        +int indiceImagen
+        -double x
+        -double y
+        -double vx
+        -double vy
+        -Color color
+        -int indiceImagen
         -Random random
         +actualizar(int anchoFondo, int altoFondo)
         +obtenerLimites() Rectangle2D
@@ -141,8 +140,8 @@ classDiagram
     }
     
     class ManchaSangre {
-        +double x
-        +double y
+        -double x
+        -double y
         +ManchaSangre(double x, double y)
     }
     
@@ -279,8 +278,8 @@ public void actionPerformed(ActionEvent e) {
 La cámara sigue al jugador con suavizado (interpolación):
 
 ```java
-camaraX += (jugador.x - camaraX) * 0.1;
-camaraY += (jugador.y - camaraY) * 0.1;
+camaraX += (jugador.getX() - camaraX) * 0.1;
+camaraY += (jugador.getY() - camaraY) * 0.1;
 ```
 
 Con esto conseguimos que aunque la cámara comience con el coche del jugador justo en el centro, cuando empieza a moverse, ésta lo sigue poco a poco, dando la sensación de que lo siguiese un dron o un helicóptero y no algo tan artificial como que fuese pegada al coche constantemente con él en el centro.
@@ -297,8 +296,8 @@ Se utilizan hitboxes rectangulares con `Rectangle2D`:
 
 ```java
 // Colisión jugador-peatón
-if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.velocidad) > 2) {
-    manchasSangre.add(new ManchaSangre(p.x, p.y));
+if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.getVelocidad()) > 2) {
+    manchasSangre.add(new ManchaSangre(p.getX(), p.getY()));
     peatones.remove(i);
     puntuacion += 15;
     generarPeaton();
@@ -309,8 +308,8 @@ if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.
 
 ```java
 // Colisión jugador-vehículo
-if (jugador.obtenerLimites().intersects(v.obtenerLimites()) && !v.estaDestruido) {
-    v.estaDestruido = true;
+if (jugador.obtenerLimites().intersects(v.obtenerLimites()) && !v.isEstaDestruido()) {
+    v.setEstaDestruido(true);
     puntuacion += 70;
 }
 ```
