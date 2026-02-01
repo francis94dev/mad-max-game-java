@@ -212,8 +212,8 @@ if (puntuacion >= puntuacionObjetivo) {
     oleada++;
     puntuacionObjetivo += 1500;
     tiempoRestante = 60;
-    jugador.setVelocidadMaxima(7.0 + (oleada * 1.0));
-    // Al pasar a la siguiente oleada generamos 15 nuevos vehículos y peatones
+    jugador.setVelocidadMaxima(jugador.getVelocidadMaxima() + oleada);
+    // Al pasar a la siguiente oleada, se crean 15 coches y peatones más
     for (int i = 0; i < 15; i++) {
         generarVehiculo();
         generarPeaton();
