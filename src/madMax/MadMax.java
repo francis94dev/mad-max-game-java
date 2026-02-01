@@ -40,6 +40,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
     private int oleada;
     private float tiempoRestante;
     private int puntuacionObjetivo;
+    private double minVelocidadAtropello;
+    private double minVelocidadChoque;
 
     // Cámara
     private double camaraX, camaraY;
@@ -108,6 +110,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         tiempoRestante = 60;
         puntuacionObjetivo = 1000;
         puntuacion = 0;
+        minVelocidadAtropello = 1.0;
+        minVelocidadChoque = 3.0;
 
         // La cámara empieza donde el jugador
         camaraX = jugador.getX();
@@ -281,6 +285,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             puntuacionObjetivo += 1500;
             tiempoRestante = 60;
             jugador.setVelocidadMaxima(jugador.getVelocidadMaxima() + oleada);
+            minVelocidadAtropello += 0.5;
+            minVelocidadChoque += 0.5;
             // Al pasar a la siguiente oleada, se crean 15 coches y peatones más
             for (int i = 0; i < 15; i++) {
                 generarVehiculo();
@@ -316,7 +322,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
             if (npc.isEsIA() && !npc.isEstaDestruido()) {
                 Rectangle2D npcHitbox = new Rectangle2D.Double(npc.getX() - 10, npc.getY() - 10, 20, 20);
-                if (jugador.obtenerLimites().intersects(npcHitbox)) {
+                if (jugador.obtenerLimites().intersects(npcHitbox)
+                        && Math.abs(jugador.getVelocidad()) > minVelocidadChoque) {
                     npc.setEstaDestruido(true);
                     puntuacion += 70; // updated score as per user edit
                     jugador.setVelocidad(jugador.getVelocidad() * 0.5);
@@ -330,7 +337,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             p.actualizar(anchoFondo, altoFondo);
 
             // Colisión jugador-peatón
-            if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.getVelocidad()) > 2) {
+            if (jugador.obtenerLimites().intersects(p.obtenerLimites())
+                    && Math.abs(jugador.getVelocidad()) > minVelocidadAtropello) {
                 manchasSangre.add(new ManchaSangre(p.getX(), p.getY()));
                 peatones.remove(i);
                 puntuacion += 15;
