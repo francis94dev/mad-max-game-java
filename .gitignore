@@ -1,3 +1,4 @@
-INFORME_PRACTICA.md
-Proyecto Juego Mad Max.md
-README.md
+bin/
+*.class
+.DS_Store
+Thumbs.db

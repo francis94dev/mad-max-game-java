@@ -4,6 +4,6 @@
 /**
  * 
  */
-module gta {
+module madmax {
 	requires java.desktop;
 }
