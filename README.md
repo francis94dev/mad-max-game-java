@@ -92,7 +92,6 @@ classDiagram
         -int puntuacion
         -int puntuacionObjetivo
         -int oleada
-        -int oleada
         -int tiempoRestante
         -double minVelocidadAtropello
         -double minVelocidadChoque
@@ -548,7 +547,7 @@ java --module-path bin -m madmax/madMax.MadMax
 - [ ] Implementar power-ups
 - [ ] Sistema de vidas
 - [ ] Guardar puntuaciones máximas
-- [ ] Mejores animaciones de sprites
+- [ ] Incorporar animaciones a los sprites
 - [ ] Añadir sonidos para colisiones, aceleración del vehículo, etc.
 
 ---
