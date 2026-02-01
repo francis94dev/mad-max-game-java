@@ -31,10 +31,9 @@ Mad Max: Wasteland Driver es un videojuego 2D desarrollado en Java utilizando la
 
 El jugador controla un vehículo en un mapa abierto donde debe:
 
-- Atropellar peatones para ganar puntos.
-- Destruir vehículos enemigos embistiéndolos.
+- Atropellar peatones y destruir vehículos para ganar puntos.
 - Lograr los puntos requeridos para pasar a la siguiente oleada.
-- Superar múltiples oleadas con dificultad progresiva.
+- Superar múltiples oleadas.
 
 
 
