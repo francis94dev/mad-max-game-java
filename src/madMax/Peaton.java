@@ -7,9 +7,9 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class Peaton {
-    double x, y, vx, vy;
-    Color color;
-    int indiceImagen;
+    private double x, y, vx, vy;
+    private Color color;
+    private int indiceImagen;
     private Random random;
 
     public Peaton(double x, double y, Random random) {
@@ -47,5 +47,53 @@ public class Peaton {
             g2d.fillOval(drawX - 10, drawY - 4, 20, 8);
             g2d.drawImage(imagenesPeaton[indiceImagen], drawX - size / 2, drawY - size / 2, size, size, null);
         }
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getVx() {
+        return vx;
+    }
+
+    public void setVx(double vx) {
+        this.vx = vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
+    public void setVy(double vy) {
+        this.vy = vy;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public int getIndiceImagen() {
+        return indiceImagen;
+    }
+
+    public void setIndiceImagen(int indiceImagen) {
+        this.indiceImagen = indiceImagen;
     }
 }

@@ -8,12 +8,12 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class Coche {
-    double x, y, angulo, velocidad;
-    Color color;
-    boolean esIA;
-    boolean estaDestruido;
-    double anguloObjetivo;
-    int indiceImagen;
+    private double x, y, angulo, velocidad;
+    private Color color;
+    private boolean esIA;
+    private boolean estaDestruido;
+    private double anguloObjetivo;
+    private int indiceImagen;
     private Random random;
 
     public Coche(double x, double y, Color color, boolean esIA, Random random) {
@@ -33,6 +33,10 @@ public class Coche {
 
     public void setVelocidadMaxima(double max) {
         this.velocidadMaxima = max;
+    }
+
+    public double getVelocidadMaxima() {
+        return velocidadMaxima;
     }
 
     public void acelerar() {
@@ -110,5 +114,57 @@ public class Coche {
 
         }
         g2d.setTransform(old);
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getVelocidad() {
+        return velocidad;
+    }
+
+    public void setVelocidad(double velocidad) {
+        this.velocidad = velocidad;
+    }
+
+    public double getAngulo() {
+        return angulo;
+    }
+
+    public void setAngulo(double angulo) {
+        this.angulo = angulo;
+    }
+
+    public boolean isEstaDestruido() {
+        return estaDestruido;
+    }
+
+    public void setEstaDestruido(boolean estaDestruido) {
+        this.estaDestruido = estaDestruido;
+    }
+
+    public boolean isEsIA() {
+        return esIA;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public int getIndiceImagen() {
+        return indiceImagen;
     }
 }

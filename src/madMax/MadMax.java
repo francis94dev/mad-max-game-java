@@ -110,8 +110,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
         puntuacion = 0;
 
         // La cámara empieza donde el jugador
-        camaraX = jugador.x;
-        camaraY = jugador.y;
+        camaraX = jugador.getX();
+        camaraY = jugador.getY();
 
         // Reiniciar variables de control (teclas sueltas)
         arribaPresionado = false;
@@ -280,8 +280,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             oleada++;
             puntuacionObjetivo += 1500;
             tiempoRestante = 60;
-            jugador.setVelocidadMaxima(7.0 + (oleada * 1.0));
-
+            jugador.setVelocidadMaxima(jugador.getVelocidadMaxima() + oleada);
+            // Al pasar a la siguiente oleada, se crean 15 coches y peatones más
             for (int i = 0; i < 15; i++) {
                 generarVehiculo();
                 generarPeaton();
@@ -298,29 +298,29 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
         jugador.actualizar();
 
-        jugador.x = Math.max(20, Math.min(anchoFondo - 20, jugador.x));
-        jugador.y = Math.max(20, Math.min(altoFondo - 20, jugador.y));
+        jugador.setX(Math.max(20, Math.min(anchoFondo - 20, jugador.getX())));
+        jugador.setY(Math.max(20, Math.min(altoFondo - 20, jugador.getY())));
 
         // Suavizado de cámara (interpolación lineal)
-        camaraX += (jugador.x - camaraX) * 0.1;
-        camaraY += (jugador.y - camaraY) * 0.1;
+        camaraX += (jugador.getX() - camaraX) * 0.1;
+        camaraY += (jugador.getY() - camaraY) * 0.1;
 
         for (Coche npc : vehiculos) {
             npc.actualizarIA();
             npc.actualizar();
 
-            if (npc.x < 0 || npc.x > anchoFondo || npc.y < 0 || npc.y > altoFondo) {
-                npc.x = random.nextDouble() * anchoFondo;
-                npc.y = random.nextDouble() * altoFondo;
+            if (npc.getX() < 0 || npc.getX() > anchoFondo || npc.getY() < 0 || npc.getY() > altoFondo) {
+                npc.setX(random.nextDouble() * anchoFondo);
+                npc.setY(random.nextDouble() * altoFondo);
             }
 
-            if (npc.esIA && !npc.estaDestruido) {
-                Rectangle2D npcHitbox = new Rectangle2D.Double(npc.x - 10, npc.y - 10, 20, 20);
+            if (npc.isEsIA() && !npc.isEstaDestruido()) {
+                Rectangle2D npcHitbox = new Rectangle2D.Double(npc.getX() - 10, npc.getY() - 10, 20, 20);
                 if (jugador.obtenerLimites().intersects(npcHitbox)) {
-                    npc.estaDestruido = true;
+                    npc.setEstaDestruido(true);
                     puntuacion += 70; // updated score as per user edit
-                    jugador.velocidad *= 0.5;
-                    npc.velocidad = 0;
+                    jugador.setVelocidad(jugador.getVelocidad() * 0.5);
+                    npc.setVelocidad(0);
                 }
             }
         }
@@ -330,8 +330,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             p.actualizar(anchoFondo, altoFondo);
 
             // Colisión jugador-peatón
-            if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.velocidad) > 2) {
-                manchasSangre.add(new ManchaSangre(p.x, p.y));
+            if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.getVelocidad()) > 2) {
+                manchasSangre.add(new ManchaSangre(p.getX(), p.getY()));
                 peatones.remove(i);
                 puntuacion += 15;
                 generarPeaton();
@@ -380,8 +380,8 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
             int tamanoSangre = 64;
             for (ManchaSangre mancha : manchasSangre) {
                 g2d.drawImage(imagenSangre,
-                        (int) mancha.x + offsetX - tamanoSangre / 2,
-                        (int) mancha.y + offsetY - tamanoSangre / 2,
+                        (int) mancha.getX() + offsetX - tamanoSangre / 2,
+                        (int) mancha.getY() + offsetY - tamanoSangre / 2,
                         tamanoSangre, tamanoSangre, null);
             }
         }
@@ -436,7 +436,7 @@ public class MadMax extends JPanel implements ActionListener, KeyListener {
 
         // Barra de velocidad
         // Regla de 3 para calcular el ancho de la barra según la velocidad
-        int velocidadReal = (int) Math.abs(jugador.velocidad * 10);
+        int velocidadReal = (int) Math.abs(jugador.getVelocidad() * 10);
         int maxVelocidad = 100; // Ajusta esto a tu máx velocidad
         int anchoBarra = (int) ((velocidadReal / (double) maxVelocidad) * 220); // 220 es el ancho máx de la barra
         if (anchoBarra > 220)
