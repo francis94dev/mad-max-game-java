@@ -92,7 +92,10 @@ classDiagram
         -int puntuacion
         -int puntuacionObjetivo
         -int oleada
+        -int oleada
         -int tiempoRestante
+        -double minVelocidadAtropello
+        -double minVelocidadChoque
         +actionPerformed(ActionEvent e)
         +paintComponent(Graphics g)
         +keyPressed(KeyEvent e)
@@ -204,6 +207,7 @@ Al alcanzar la puntuación objetivo, se avanza de oleada:
 - Se generan más enemigos y peatones
 - El temporizador se reinicia a 60 segundos
 - La velocidad máxima del jugador aumenta
+- La velocidad mínima requerida para destruir enemigos y atropellar peatones aumenta
 
 ```java
 // Si llegamos a los puntos necesarios, pasamos de ronda
@@ -296,7 +300,7 @@ Se utilizan hitboxes rectangulares con `Rectangle2D`:
 
 ```java
 // Colisión jugador-peatón
-if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.getVelocidad()) > 2) {
+if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.getVelocidad()) > minVelocidadAtropello) {
     manchasSangre.add(new ManchaSangre(p.getX(), p.getY()));
     peatones.remove(i);
     puntuacion += 15;
@@ -309,8 +313,11 @@ if (jugador.obtenerLimites().intersects(p.obtenerLimites()) && Math.abs(jugador.
 ```java
 // Colisión jugador-vehículo
 if (jugador.obtenerLimites().intersects(v.obtenerLimites()) && !v.isEstaDestruido()) {
-    v.setEstaDestruido(true);
-    puntuacion += 70;
+    // Verificamos si vamos lo suficientemente rápido para destruirlo
+    if (Math.abs(jugador.getVelocidad()) > minVelocidadChoque) {
+        v.setEstaDestruido(true);
+        puntuacion += 70;
+    }
 }
 ```
 
